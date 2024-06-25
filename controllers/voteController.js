@@ -43,34 +43,34 @@ const getVotes = async (req, res) => {
 const getResults = async (req, res) => {
   try {
     const results = await Vote.aggregate([
+      { $unwind: "$votes" },
       {
         $group: {
-          _id: "$candidate",
+          _id: {
+            position: "$votes.position",
+            candidate: "$votes.candidate",
+          },
           totalVotes: { $sum: 1 },
         },
       },
       {
         $lookup: {
           from: "candidates",
-          localField: "_id",
+          localField: "_id.candidate",
           foreignField: "_id",
           as: "candidate",
         },
       },
-      {
-        $unwind: "$candidate",
-      },
+      { $unwind: "$candidate" },
       {
         $lookup: {
           from: "positions",
-          localField: "candidate.position",
+          localField: "_id.position",
           foreignField: "_id",
           as: "position",
         },
       },
-      {
-        $unwind: "$position",
-      },
+      { $unwind: "$position" },
       {
         $project: {
           candidate: "$candidate.name",
@@ -79,7 +79,7 @@ const getResults = async (req, res) => {
         },
       },
       {
-        $sort: { totalVotes: -1 },
+        $sort: { "position.name": 1, totalVotes: -1 },
       },
     ]);
 
