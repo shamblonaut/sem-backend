@@ -1,16 +1,17 @@
-const express = require("express");
-const {
+import express from "express";
+import authMiddleware from "../middleware/authMiddleware.js";
+import {
   addCandidate,
-  editCandidate,
-  deleteCandidate,
   getCandidates,
-} = require("../controllers/candidateController");
-const authMiddleware = require("../middleware/authMiddleware");
+  deleteCandidate,
+  editCandidate,
+} from "../controllers/candidateController.js";
+
 const router = express.Router();
 
 router.post("/", authMiddleware, addCandidate);
 router.put("/:id", authMiddleware, editCandidate);
 router.delete("/:id", authMiddleware, deleteCandidate);
-router.get("/", authMiddleware, getCandidates);
+router.get("/", getCandidates);
 
-module.exports = router;
+export default router;

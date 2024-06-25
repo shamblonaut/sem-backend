@@ -1,25 +1,23 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const connectDB = require("./config/db");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import http from "http";
+
+// Import routes
+import authRoutes from "./routes/authRoutes.js";
+import candidateRoutes from "./routes/candidateRoutes.js";
+import positionRoutes from "./routes/positionRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
+import voteRoutes from "./routes/voteRoutes.js";
 
 dotenv.config();
-
-connectDB();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Import routes
-const authRoutes = require("./routes/authRoutes");
-const candidateRoutes = require("./routes/candidateRoutes");
-const positionRoutes = require("./routes/positionRoutes");
-const sessionRoutes = require("./routes/sessionRoutes");
-const voteRoutes = require("./routes/voteRoutes");
-
-// Middleware
+// Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/candidates", candidateRoutes);
 app.use("/api/positions", positionRoutes);
@@ -28,14 +26,15 @@ app.use("/api/votes", voteRoutes);
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => console.log(err));
 
+// Create an HTTP server
+const server = http.createServer(app);
+
+// Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-module.exports = app;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

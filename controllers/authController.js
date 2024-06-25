@@ -1,7 +1,7 @@
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const { username, password, role } = req.body;
     const user = await User.create({ username, password, role });
@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
     res.json({ token });
   } catch (error) {
@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.getUsers = async (req, res) => {
+const getUsers = async (req, res) => {
   try {
     const users = await User.find();
 
@@ -42,3 +42,4 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+export { register, login, getUsers };

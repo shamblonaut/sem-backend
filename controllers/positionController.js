@@ -1,7 +1,7 @@
-const Position = require("../models/Position");
-const Candidate = require("../models/Candidate");
+import Position from "../models/Position.js";
+import Candidate from "../models/Candidate.js";
 
-exports.addPosition = async (req, res) => {
+const addPosition = async (req, res) => {
   try {
     const { name } = req.body;
     const position = await Position.create({ name });
@@ -12,14 +12,14 @@ exports.addPosition = async (req, res) => {
   }
 };
 
-exports.editPosition = async (req, res) => {
+const editPosition = async (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
     const position = await Position.findByIdAndUpdate(
       id,
       { name },
-      { new: true }
+      { new: true },
     );
 
     if (!position) {
@@ -32,7 +32,7 @@ exports.editPosition = async (req, res) => {
   }
 };
 
-exports.deletePosition = async (req, res) => {
+const deletePosition = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -50,7 +50,7 @@ exports.deletePosition = async (req, res) => {
   }
 };
 
-exports.getPositions = async (req, res) => {
+const getPositions = async (req, res) => {
   try {
     const positions = await Position.find().populate("candidates");
 
@@ -60,3 +60,4 @@ exports.getPositions = async (req, res) => {
   }
 };
 
+export { addPosition, editPosition, deletePosition, getPositions };

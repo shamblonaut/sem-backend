@@ -1,14 +1,15 @@
-const express = require("express");
-const {
+import express from "express";
+import authMiddleware from "../middleware/authMiddleware.js";
+import {
   castVote,
   getVotes,
   getResults,
-} = require("../controllers/voteController");
-const authMiddleware = require("../middleware/authMiddleware");
+} from "../controllers/voteController.js";
+
 const router = express.Router();
 
-router.post("/", authMiddleware, castVote);
+router.post("/", castVote);
 router.get("/", authMiddleware, getVotes);
 router.get("/results", authMiddleware, getResults);
 
-module.exports = router;
+export default router;

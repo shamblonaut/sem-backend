@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const positionSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }]
+  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "Candidate" }],
 });
 
-module.exports = mongoose.model('Position', positionSchema);
-
+export default mongoose.model("Position", positionSchema);

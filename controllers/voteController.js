@@ -1,23 +1,26 @@
-const Vote = require("../models/Vote");
-const Candidate = require("../models/Candidate");
-const VotingSession = require("../models/VotingSession");
+import Vote from "../models/Vote.js";
+import VotingSession from "../models/VotingSession.js";
 
-exports.castVote = async (req, res) => {
+const castVote = async (req, res) => {
   try {
-    const { candidateId, sessionId } = req.body;
-    const candidate = await Candidate.findById(candidateId);
+    const { voterName, voterId, votes, sessionId } = req.body;
+
     const session = await VotingSession.findById(sessionId);
 
-    if (!candidate || !session) {
-      return res.status(404).json({ error: "Candidate or session not found" });
+    if (!session) {
+      return res.status(404).json({ error: "Voting session not found" });
     }
     if (!session.isActive) {
       return res.status(400).json({ error: "Voting session is not active" });
     }
 
     const vote = await Vote.create({
-      student: req.user.id,
-      candidate: candidateId,
+      voterName: voterName,
+      voterId: voterId,
+      votes: votes.map((vote) => ({
+        position: vote.positionId,
+        candidate: vote.candidateId,
+      })),
       session: sessionId,
     });
 
@@ -27,7 +30,7 @@ exports.castVote = async (req, res) => {
   }
 };
 
-exports.getVotes = async (req, res) => {
+const getVotes = async (req, res) => {
   try {
     const votes = await Vote.find().populate("candidate session");
 
@@ -37,7 +40,7 @@ exports.getVotes = async (req, res) => {
   }
 };
 
-exports.getResults = async (req, res) => {
+const getResults = async (req, res) => {
   try {
     const results = await Vote.aggregate([
       {
@@ -86,3 +89,4 @@ exports.getResults = async (req, res) => {
   }
 };
 
+export { castVote, getVotes, getResults };

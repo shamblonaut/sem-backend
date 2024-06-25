@@ -1,20 +1,25 @@
-const Candidate = require("../models/Candidate");
-const Position = require("../models/Position");
+import Candidate from "../models/Candidate.js";
+import Position from "../models/Position.js";
 
-exports.addCandidate = async (req, res) => {
+const addCandidate = async (req, res) => {
   try {
-    const { name, positionId } = req.body;
+    const { name, grade, division, positionId } = req.body;
     const position = await Position.findById(positionId);
 
     if (!position) {
       return res.status(404).json({ error: "Position not found" });
     }
 
-    const candidate = await Candidate.create({ name, position: positionId });
+    const candidate = await Candidate.create({
+      name,
+      grade,
+      division,
+      position: positionId,
+    });
     await Position.findByIdAndUpdate(
       positionId,
       { $push: { candidates: candidate._id } },
-      { new: true }
+      { new: true },
     );
 
     res.status(201).json({ candidate, message: "Candidate added" });
@@ -23,10 +28,10 @@ exports.addCandidate = async (req, res) => {
   }
 };
 
-exports.editCandidate = async (req, res) => {
+const editCandidate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, positionId } = req.body;
+    const { name, grade, division, positionId } = req.body;
     const candidate = await Candidate.findById(id);
 
     if (!candidate) {
@@ -39,24 +44,22 @@ exports.editCandidate = async (req, res) => {
       await Position.findByIdAndUpdate(
         candidate.position,
         { $pull: { candidates: candidate._id } },
-        { new: true }
+        { new: true },
       );
 
       // Add candidate to new position's candidates list
       await Position.findByIdAndUpdate(
         positionId,
         { $push: { candidates: candidate._id } },
-        { new: true }
+        { new: true },
       );
     }
 
     await Candidate.findByIdAndUpdate(
       id,
-      { name, position: positionId },
-      { new: true }
+      { name, grade, division, position: positionId },
+      { new: true },
     );
-
-
 
     res.json({ candidate, message: "Candidate updated" });
   } catch (error) {
@@ -64,7 +67,7 @@ exports.editCandidate = async (req, res) => {
   }
 };
 
-exports.deleteCandidate = async (req, res) => {
+const deleteCandidate = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -72,7 +75,7 @@ exports.deleteCandidate = async (req, res) => {
     await Position.findByIdAndUpdate(
       candidate.position,
       { $pull: { candidates: candidate._id } },
-      { new: true }
+      { new: true },
     );
     await Candidate.findByIdAndDelete(id);
 
@@ -86,7 +89,7 @@ exports.deleteCandidate = async (req, res) => {
   }
 };
 
-exports.getCandidates = async (req, res) => {
+const getCandidates = async (req, res) => {
   try {
     const candidates = await Candidate.find().populate("position");
     res.json({ candidates });
@@ -95,3 +98,4 @@ exports.getCandidates = async (req, res) => {
   }
 };
 
+export { addCandidate, editCandidate, deleteCandidate, getCandidates };

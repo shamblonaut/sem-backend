@@ -1,7 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const candidateSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  grade: { type: Number, required: true },
+  division: { type: String, required: true },
   position: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Position",
@@ -9,4 +11,4 @@ const candidateSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Candidate", candidateSchema);
+export default mongoose.model("Candidate", candidateSchema);

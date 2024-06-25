@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const voteSchema = new mongoose.Schema({
-  student: {
+  position: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Position",
     required: true,
   },
   candidate: {
@@ -11,6 +11,12 @@ const voteSchema = new mongoose.Schema({
     ref: "Candidate",
     required: true,
   },
+});
+
+const votesSchema = new mongoose.Schema({
+  voterName: { type: String, required: true },
+  voterId: { type: Number, required: true },
+  votes: [voteSchema],
   session: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "VotingSession",
@@ -18,4 +24,4 @@ const voteSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Vote", voteSchema);
+export default mongoose.model("Vote", votesSchema);
