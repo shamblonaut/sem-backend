@@ -1,27 +1,15 @@
 import Vote from "../models/Vote.js";
-import VotingSession from "../models/VotingSession.js";
 
 const castVote = async (req, res) => {
   try {
-    const { voterName, voterId, votes, sessionId } = req.body;
-
-    const session = await VotingSession.findById(sessionId);
-
-    if (!session) {
-      return res.status(404).json({ error: "Voting session not found" });
-    }
-    if (!session.isActive) {
-      return res.status(400).json({ error: "Voting session is not active" });
-    }
+    const { voterInfo, votes } = req.body;
 
     const vote = await Vote.create({
-      voterName: voterName,
-      voterId: voterId,
+      voterInfo,
       votes: votes.map((vote) => ({
         position: vote.positionId,
         candidate: vote.candidateId,
       })),
-      session: sessionId,
     });
 
     res.status(201).json({ vote, message: "Vote casted" });
@@ -40,8 +28,7 @@ const getVotes = async (req, res) => {
       .populate({
         path: "votes.position",
         model: "Position",
-      })
-      .populate("session");
+      });
 
     res.json(votes);
   } catch (error) {

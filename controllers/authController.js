@@ -34,7 +34,7 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select("username");
 
     res.json({ users });
   } catch (error) {

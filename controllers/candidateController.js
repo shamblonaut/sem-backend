@@ -3,7 +3,7 @@ import Position from "../models/Position.js";
 
 const addCandidate = async (req, res) => {
   try {
-    const { name, grade, division, positionId } = req.body;
+    const { name, grade, section, positionId } = req.body;
     const position = await Position.findById(positionId);
 
     if (!position) {
@@ -13,7 +13,7 @@ const addCandidate = async (req, res) => {
     const candidate = await Candidate.create({
       name,
       grade,
-      division,
+      section,
       position: positionId,
     });
     await Position.findByIdAndUpdate(
@@ -31,7 +31,7 @@ const addCandidate = async (req, res) => {
 const editCandidate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, grade, division, positionId } = req.body;
+    const { name, grade, section, positionId } = req.body;
     const candidate = await Candidate.findById(id);
 
     if (!candidate) {
@@ -57,7 +57,7 @@ const editCandidate = async (req, res) => {
 
     await Candidate.findByIdAndUpdate(
       id,
-      { name, grade, division, position: positionId },
+      { name, grade, section, position: positionId },
       { new: true },
     );
 

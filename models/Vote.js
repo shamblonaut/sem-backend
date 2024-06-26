@@ -13,15 +13,28 @@ const voteSchema = new mongoose.Schema({
   },
 });
 
-const votesSchema = new mongoose.Schema({
-  voterName: { type: String, required: true },
-  voterId: { type: Number, required: true },
-  votes: [voteSchema],
-  session: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "VotingSession",
+const voterInfoSchema = new mongoose.Schema({
+  name: {
+    type: String,
     required: true,
   },
+  grade: {
+    type: String,
+    required: true,
+  },
+  section: {
+    type: String,
+    required: true,
+  },
+  isStaff: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const votesSchema = new mongoose.Schema({
+  voterInfo: voterInfoSchema,
+  votes: [voteSchema],
 });
 
 export default mongoose.model("Vote", votesSchema);
