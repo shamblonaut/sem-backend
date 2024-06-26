@@ -32,7 +32,16 @@ const castVote = async (req, res) => {
 
 const getVotes = async (req, res) => {
   try {
-    const votes = await Vote.find().populate("candidate session");
+    const votes = await Vote.find()
+      .populate({
+        path: "votes.candidate",
+        model: "Candidate",
+      })
+      .populate({
+        path: "votes.position",
+        model: "Position",
+      })
+      .populate("session");
 
     res.json(votes);
   } catch (error) {
