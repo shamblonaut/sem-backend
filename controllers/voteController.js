@@ -38,7 +38,8 @@ const getVotes = async (req, res) => {
 
 const getResults = async (req, res) => {
   try {
-    const results = await Vote.aggregate([
+    const studentResults = await Vote.aggregate([
+      { $match: { "voterInfo.isStaff": false } }, // Match student votes
       { $unwind: "$votes" },
       {
         $group: {
@@ -79,7 +80,49 @@ const getResults = async (req, res) => {
       },
     ]);
 
-    res.json({ results });
+    const staffResults = await Vote.aggregate([
+      { $match: { "voterInfo.isStaff": true } }, // Match staff votes
+      { $unwind: "$votes" },
+      {
+        $group: {
+          _id: {
+            position: "$votes.position",
+            candidate: "$votes.candidate",
+          },
+          totalVotes: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "candidates",
+          localField: "_id.candidate",
+          foreignField: "_id",
+          as: "candidate",
+        },
+      },
+      { $unwind: "$candidate" },
+      {
+        $lookup: {
+          from: "positions",
+          localField: "_id.position",
+          foreignField: "_id",
+          as: "position",
+        },
+      },
+      { $unwind: "$position" },
+      {
+        $project: {
+          candidate: "$candidate.name",
+          position: "$position.name",
+          totalVotes: 1,
+        },
+      },
+      {
+        $sort: { "position.name": 1, totalVotes: -1 },
+      },
+    ]);
+
+    res.json({ studentResults, staffResults });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
