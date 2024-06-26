@@ -1,3 +1,5 @@
+import path from "path";
+
 import Candidate from "../models/Candidate.js";
 import Position from "../models/Position.js";
 
@@ -10,12 +12,18 @@ const addCandidate = async (req, res) => {
       return res.status(404).json({ error: "Position not found" });
     }
 
-    const candidate = await Candidate.create({
+    const newCandidate = {
       name,
       grade,
       section,
       position: positionId,
-    });
+    };
+
+    if (req.file) {
+      newCandidate.image = req.file.filename;
+    }
+
+    const candidate = await Candidate.create(newCandidate);
     await Position.findByIdAndUpdate(
       positionId,
       { $push: { candidates: candidate._id } },
@@ -55,11 +63,14 @@ const editCandidate = async (req, res) => {
       );
     }
 
-    await Candidate.findByIdAndUpdate(
-      id,
-      { name, grade, section, position: positionId },
-      { new: true },
-    );
+    const updatedCandidate = { name, grade, section, position: positionId };
+
+    // Update image filename if a new image is uploaded
+    if (req.file) {
+      updatedCandidate.image = req.file.filename;
+    }
+
+    await Candidate.findByIdAndUpdate(id, updatedCandidate, { new: true });
 
     res.json({ candidate, message: "Candidate updated" });
   } catch (error) {
@@ -98,4 +109,19 @@ const getCandidates = async (req, res) => {
   }
 };
 
-export { addCandidate, editCandidate, deleteCandidate, getCandidates };
+const getCandidateImage = async (req, res) => {
+  const { id } = req.params;
+  const candidate = await Candidate.findById(id);
+
+  if (candidate.image) {
+    res.sendFile(path.resolve(`uploads/${candidate.image}`));
+  }
+};
+
+export {
+  addCandidate,
+  editCandidate,
+  deleteCandidate,
+  getCandidates,
+  getCandidateImage,
+};

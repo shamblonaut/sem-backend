@@ -9,6 +9,7 @@ const candidateSchema = new mongoose.Schema({
     ref: "Position",
     required: true,
   },
+  image: { type: String },
 });
 
 export default mongoose.model("Candidate", candidateSchema);
