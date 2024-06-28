@@ -1,5 +1,8 @@
 import Vote from "../models/Vote.js";
 
+let studentVotes = 0;
+let staffVotes = 0;
+
 const castVote = async (req, res) => {
   try {
     const { voterInfo, votes } = req.body;
@@ -13,6 +16,16 @@ const castVote = async (req, res) => {
     });
 
     res.status(201).json({ vote, message: "Vote casted" });
+
+    if (voterInfo.isStaff) {
+      console.log(
+        `Staff vote no. ${++staffVotes}: ${voterInfo.name} [${voterInfo.grade} ${voterInfo.section}] cated a vote!`,
+      );
+    } else {
+      console.log(
+        `Student vote no. ${++studentVotes}: ${voterInfo.name} [${voterInfo.grade} ${voterInfo.section}] casted a vote!`,
+      );
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
